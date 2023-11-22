@@ -2,6 +2,9 @@
 
 [WezTerm](https://wezfurlong.org/wezterm) port of [tmux-project](https://github.com/sei40kr/tmux-project).
 
+wez-per-project-workspace scans and lists projects in the specified directories
+and allows you to create or switch to a workspace for each project.
+
 ## Installation
 
 Clone this repository into your `$XDG_CONFIG_HOME/wezterm` directory:
