@@ -4,10 +4,36 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local mux = wezterm.mux
 
----@param opts { base_dirs: { path: string, min_depth: number?, max_depth: number? }[], rooters: string[]? }
+local home_dir = wezterm.home_dir
+
+local function shorten_path(path, base_dir)
+  -- Exceptionally, if the path is the base dir itself or not a child of the
+  -- base dir, then we don't shorten it.
+  if path:sub(1, #base_dir + 1) ~= base_dir .. "/" then
+    return path
+  end
+
+  local short_base_dir = base_dir
+
+  if short_base_dir:sub(1, #home_dir) == home_dir then
+    short_base_dir = "~" .. short_base_dir:sub(#home_dir + 1)
+  end
+
+  short_base_dir = short_base_dir:gsub("/(.).*", "/%1")
+
+  return short_base_dir .. path:sub(#base_dir + 1)
+end
+
+---@param opts { base_dirs: { path: string, min_depth: number?, max_depth: number? }[], rooters: string[]?, shorten_paths: boolean? }
 local function ProjectWorkspaceSelect(opts)
   local base_dirs = {}
   local rooters = opts.rooters or { ".git" }
+  local shorten_paths = opts.shorten_paths
+
+  if shorten_paths == nil then
+    shorten_paths = true
+  end
+
   local rooter_find_args = {}
 
   for i, base_dir in ipairs(opts.base_dirs) do
@@ -45,10 +71,13 @@ local function ProjectWorkspaceSelect(opts)
       local more_projects = wezterm.split_by_newlines(stdout)
 
       for _, project in ipairs(more_projects) do
-        table.insert(projects, {
-          id = project,
-          label = project,
-        })
+        local label = project
+
+        if shorten_paths then
+          label = shorten_path(project, base_dir.path)
+        end
+
+        table.insert(projects, { id = project, label = label })
       end
     end
 
