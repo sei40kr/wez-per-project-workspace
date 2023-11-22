@@ -38,6 +38,7 @@ config.keys = {
                     max_depth = 3,
                 },
             },
+            rooters = { ".git" },
             shorten_paths = true,
         }),
     }
