@@ -62,3 +62,22 @@ return config
 | `path`      | Required | Base directory path.                                                                      |
 | `min_depth` | `1`      | Minimum depth of project root. Setting this to `0` will add the `path` as a project root. |
 | `max_depth` | `1`      | Maximum depth of project root. Setting this to `0` will add the `path` as a project root. |
+
+## Tips
+
+### Show current workspace name in the status bar
+
+The code snippet below shows the basename of the current workspace in the status
+bar:
+
+```lua
+wezterm.on("update-status", function(window, _)
+    window:set_left_status(
+        wezterm.format({
+            { Attribute = { Intensity = "Bold" } },
+            { Text = window:mux_window():get_workspace():gsub("^.*/", "") },
+            "ResetAttributes",
+        })
+    )
+end)
+```
