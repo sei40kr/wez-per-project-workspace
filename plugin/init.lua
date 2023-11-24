@@ -64,13 +64,13 @@ local function ProjectWorkspaceSelect(opts)
         table.unpack(rooter_find_args),
       }
       table.insert(find_args, ")")
-      table.insert(find_args, "-printf")
-      table.insert(find_args, "%h\n")
 
       local _, stdout, _ = wezterm.run_child_process(find_args)
       local more_projects = wezterm.split_by_newlines(stdout)
 
       for _, project in ipairs(more_projects) do
+        -- Strip the rooter from the path
+        project = project:gsub("/[^/]*$", "")
         local label = project
 
         if shorten_paths then
