@@ -53,7 +53,7 @@ return config
 | --------------- | ------------ | ------------------------------------------------ |
 | `base_dirs`     | `{}`         | List of base directories to search for projects. |
 | `rooters`       | `{ ".git" }` | List of rooters to search for project root.      |
-| `shorten_paths` | `false`      | Whether to shorten the paths of projects.        |
+| `shorten_paths` | `true`       | Whether to shorten the paths of projects.        |
 
 ### `base_dirs`
 
