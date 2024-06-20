@@ -99,7 +99,7 @@ local function ProjectWorkspaceSelect(opts)
         end
 
         if not found then
-          mux.spawn_window({ cwd = id, workspace = id })
+          mux.spawn_window({ cwd = id, workspace = id, args = { "nvim", "." } })
         end
 
         mux.set_active_workspace(id)

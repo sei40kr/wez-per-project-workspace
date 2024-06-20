@@ -5,12 +5,14 @@
 wez-per-project-workspace scans and lists projects in the specified directories
 and allows you to create or switch to a workspace for each project.
 
+This automaticly opens [Neovim](https://neovim.io) in the project root folder.
+
 ## Installation
 
 Clone this repository into your `$XDG_CONFIG_HOME/wezterm` directory:
 
 ```sh
-git clone https://github.com/sei40kr/wez-pain-control.git $XDG_CONFIG_HOME/wezterm
+git clone https://github.com/malbertzard/wez-per-project-workspace.git $XDG_CONFIG_HOME/wezterm
 ```
 
 ## Usage
@@ -63,21 +65,3 @@ return config
 | `min_depth` | `1`      | Minimum depth of project root. Setting this to `0` will add the `path` as a project root. |
 | `max_depth` | `1`      | Maximum depth of project root. Setting this to `0` will add the `path` as a project root. |
 
-## Tips
-
-### Show current workspace name in the status bar
-
-The code snippet below shows the basename of the current workspace in the status
-bar:
-
-```lua
-wezterm.on("update-status", function(window, _)
-    window:set_left_status(
-        wezterm.format({
-            { Attribute = { Intensity = "Bold" } },
-            { Text = window:mux_window():get_workspace():gsub("^.*/", "") },
-            "ResetAttributes",
-        })
-    )
-end)
-```
