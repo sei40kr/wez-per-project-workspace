@@ -1,36 +1,38 @@
 # wez-per-project-workspace
 
-[WezTerm](https://wezfurlong.org/wezterm) port of [tmux-project](https://github.com/sei40kr/tmux-project).
+[WezTerm](https://wezfurlong.org/wezterm) plugin for per-project workspace switching.
 
-wez-per-project-workspace scans and lists projects in the specified directories
-and allows you to create or switch to a workspace for each project.
+Scans projects in specified directories and allows you to create or switch to a workspace for each project.
+
+## Features
+
+- **Automatic Project Detection**: Automatically detects projects in specified base directories
+- **Workspace Management**: Create and switch to independent workspaces for each project
+- **Path Shortening**: Optionally shorten long project paths for better display
 
 ## Installation
 
-Clone this repository into your `$XDG_CONFIG_HOME/wezterm` directory:
+Clone this repository into your WezTerm plugins directory:
 
 ```sh
-git clone https://github.com/sei40kr/wez-pain-control.git $XDG_CONFIG_HOME/wezterm
+git clone https://github.com/sei40kr/wez-per-project-workspace.git $XDG_CONFIG_HOME/wezterm/plugins/wez-per-project-workspace
 ```
 
-## Usage
+## Basic Usage
+
+Add the following configuration to your `wezterm.lua`:
 
 ```lua
 local wezterm = require("wezterm")
 
-local config = {}
+local config = wezterm.config_builder()
 
-if wezterm.config_builder then
-    config = wezterm.config_builder()
-end
-
--- Add these lines:
+-- Add project workspace selection functionality
 config.keys = {
     {
-        -- You can change the key binding to whatever you want:
         key = "g",
         mods = "LEADER",
-        action = require("wez-per-project-workspace.plugin").action.ProjectWorkspaceSelect({
+        action = require("plugins.wez-per-project-workspace.plugin").action.ProjectWorkspaceSelect({
             base_dirs = {
                 {
                     path = wezterm.home_dir .. "/ghq",
@@ -47,28 +49,55 @@ config.keys = {
 return config
 ```
 
-## Options
+## Configuration Options
 
-| Option          | Default      | Description                                      |
-| --------------- | ------------ | ------------------------------------------------ |
-| `base_dirs`     | `{}`         | List of base directories to search for projects. |
-| `rooters`       | `{ ".git" }` | List of rooters to search for project root.      |
-| `shorten_paths` | `true`       | Whether to shorten the paths of projects.        |
+### Main Options
 
-### `base_dirs`
+| Option          | Default      | Description                                     |
+| --------------- | ------------ | ----------------------------------------------- |
+| `base_dirs`     | `{}`         | List of base directories to search for projects |
+| `rooters`       | `{ ".git" }` | Files/directories that identify project roots   |
+| `shorten_paths` | `true`       | Whether to shorten project paths for display    |
 
-| Option      | Defualt  | Description                                                                               |
-| ----------- | -------- | ----------------------------------------------------------------------------------------- |
-| `path`      | Required | Base directory path.                                                                      |
-| `min_depth` | `1`      | Minimum depth of project root. Setting this to `0` will add the `path` as a project root. |
-| `max_depth` | `1`      | Maximum depth of project root. Setting this to `0` will add the `path` as a project root. |
+### `base_dirs` Detailed Configuration
 
-## Tips
+Each base directory can have the following options:
 
-### Show current workspace name in the status bar
+| Option      | Default  | Description                                                          |
+| ----------- | -------- | -------------------------------------------------------------------- |
+| `path`      | Required | Path to the base directory                                           |
+| `min_depth` | `1`      | Minimum depth of project root (0 includes the base directory itself) |
+| `max_depth` | `1`      | Maximum depth of project root (0 includes the base directory itself) |
 
-The code snippet below shows the basename of the current workspace in the status
-bar:
+## Examples
+
+### Multiple Project Directories
+
+```lua
+action = require("plugins.wez-per-project-workspace.plugin").action.ProjectWorkspaceSelect({
+    base_dirs = {
+        {
+            path = wezterm.home_dir .. "/ghq",
+            min_depth = 2,
+            max_depth = 4,
+        },
+        {
+            path = wezterm.home_dir .. "/projects",
+            min_depth = 1,
+            max_depth = 2,
+        },
+        {
+            path = wezterm.home_dir .. "/work",
+            min_depth = 0,  -- Treat the work directory itself as a project
+            max_depth = 0,
+        }
+    },
+    rooters = { ".git", ".projectroot" },  -- Multiple rooters
+    shorten_paths = true,
+})
+```
+
+### Show Current Workspace in Status Bar
 
 ```lua
 wezterm.on("update-status", function(window, _)
@@ -80,4 +109,33 @@ wezterm.on("update-status", function(window, _)
         })
     )
 end)
+```
+
+## How It Works
+
+1. **Project Detection**: Uses `find` command to detect projects in specified base directories
+2. **Root Identification**: Identifies project roots based on "rooters" like `.git` directories
+3. **Workspace Management**: Creates and switches to independent workspaces for each project
+4. **Fuzzy Search**: Uses WezTerm's InputSelector for fuzzy searching and selection
+
+## Customization
+
+### Changing Key Binding
+
+```lua
+config.keys = {
+    {
+        key = "p",  -- Change to LEADER + p
+        mods = "LEADER",
+        action = require("plugins.wez-per-project-workspace.plugin").action.ProjectWorkspaceSelect({
+            -- Configuration options
+        }),
+    }
+}
+```
+
+### Adding Custom Rooters
+
+```lua
+rooters = { ".git", ".project", "package.json", "Cargo.toml" }
 ```
